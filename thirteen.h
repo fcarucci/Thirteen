@@ -630,6 +630,20 @@ namespace Thirteen
             return sel_registerName(name);
         }
 
+        // NSEventType values from AppKit's NSEvent.h.
+        constexpr NSInteger NSEventTypeLeftMouseDown = 1;
+        constexpr NSInteger NSEventTypeLeftMouseUp = 2;
+        constexpr NSInteger NSEventTypeRightMouseDown = 3;
+        constexpr NSInteger NSEventTypeRightMouseUp = 4;
+        constexpr NSInteger NSEventTypeMouseMoved = 5;
+        constexpr NSInteger NSEventTypeLeftMouseDragged = 6;
+        constexpr NSInteger NSEventTypeRightMouseDragged = 7;
+        constexpr NSInteger NSEventTypeKeyDown = 10;
+        constexpr NSInteger NSEventTypeKeyUp = 11;
+        constexpr NSInteger NSEventTypeOtherMouseDown = 25;
+        constexpr NSInteger NSEventTypeOtherMouseUp = 26;
+        constexpr NSInteger NSEventTypeOtherMouseDragged = 27;
+
         struct PlatformMetal
         {
             id app = nullptr;
@@ -700,7 +714,23 @@ namespace Thirteen
                         break;
 
                     NSInteger eventType = ((NSInteger(*)(id, SEL))objc_msgSend)(event, Sel("type"));
-                    if (eventType == 10) // NSEventTypeKeyDown
+                    const bool isMouseDownEvent =
+                        eventType == NSEventTypeLeftMouseDown ||
+                        eventType == NSEventTypeRightMouseDown ||
+                        eventType == NSEventTypeOtherMouseDown;
+                    const bool isMouseUpEvent =
+                        eventType == NSEventTypeLeftMouseUp ||
+                        eventType == NSEventTypeRightMouseUp ||
+                        eventType == NSEventTypeOtherMouseUp;
+                    const bool isMousePositionEvent =
+                        eventType == NSEventTypeMouseMoved ||
+                        eventType == NSEventTypeLeftMouseDragged ||
+                        eventType == NSEventTypeRightMouseDragged ||
+                        eventType == NSEventTypeOtherMouseDragged ||
+                        isMouseDownEvent ||
+                        isMouseUpEvent;
+
+                    if (eventType == NSEventTypeKeyDown)
                     {
                         id chars = ((id(*)(id, SEL))objc_msgSend)(event, Sel("charactersIgnoringModifiers"));
                         if (chars)
@@ -710,7 +740,7 @@ namespace Thirteen
                                 keys[(unsigned char)utf8[0]] = true;
                         }
                     }
-                    else if (eventType == 11) // NSEventTypeKeyUp
+                    else if (eventType == NSEventTypeKeyUp)
                     {
                         id chars = ((id(*)(id, SEL))objc_msgSend)(event, Sel("charactersIgnoringModifiers"));
                         if (chars)
@@ -720,19 +750,19 @@ namespace Thirteen
                                 keys[(unsigned char)utf8[0]] = false;
                         }
                     }
-                    else if (eventType == 5 || eventType == 6 || eventType == 7) // mouse down
+                    else if (isMouseDownEvent)
                     {
                         NSInteger buttonNumber = ((NSInteger(*)(id, SEL))objc_msgSend)(event, Sel("buttonNumber"));
                         if (buttonNumber >= 0 && buttonNumber < 3)
                             mouseButtons[buttonNumber] = true;
                     }
-                    else if (eventType == 8 || eventType == 9) // mouse up
+                    else if (isMouseUpEvent)
                     {
                         NSInteger buttonNumber = ((NSInteger(*)(id, SEL))objc_msgSend)(event, Sel("buttonNumber"));
                         if (buttonNumber >= 0 && buttonNumber < 3)
                             mouseButtons[buttonNumber] = false;
                     }
-                    else if (eventType == 1 || eventType == 2 || eventType == 5 || eventType == 6 || eventType == 7 || eventType == 8 || eventType == 9)
+                    else if (isMousePositionEvent)
                     {
                         CGPoint p = ((CGPoint(*)(id, SEL))objc_msgSend)(event, Sel("locationInWindow"));
                         mouseX = (int)p.x;
