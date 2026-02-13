@@ -9,6 +9,8 @@ It is inspired by the simplicity of the Mode 13h days where you initialized the 
 Alan Wolfe - API, examples and Win32/DX12 implementation
 
 Francesco Carucci - MacOS/Metal implementation
+
+Nikita Lisitsa - Linux/X11+OpenGL
 */
 
 #pragma once
