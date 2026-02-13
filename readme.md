@@ -7,6 +7,7 @@ It is inspired by the simplicity of the Mode 13h days where you initialized the 
 Platforms Supported:
 * Win32/DX12
 * MacOS/Metal
+* Linux/X11+OpenGL
 
 ## Usage
 
@@ -227,3 +228,5 @@ bool clicked = Thirteen::GetMouseButton(0) && !Thirteen::GetMouseButtonLastFrame
 Alan Wolfe - API, examples and Win32/DX12 implementation
 
 Francesco Carucci - MacOS/Metal implementation
+
+Nikita Lisitsa - Linux/X11+OpenGL
