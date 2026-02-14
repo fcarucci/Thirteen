@@ -74,4 +74,3 @@ jobs:
 
     - name: Build successful
       run: echo "Build completed successfully for ${{ matrix.example }} on ${{ runner.os }} (${{ matrix.config }})"
-      run: echo "Build completed successfully for ${{ matrix.example }} on ${{ runner.os }}"
