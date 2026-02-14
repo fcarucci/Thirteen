@@ -480,6 +480,10 @@ namespace Thirteen
                     nullptr,
                     &swapChain1
                 );
+
+                // Disable Alt+Enter fullscreen toggle on Windows
+                factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER);
+
                 factory->Release();
 
                 if (FAILED(hr))
@@ -1502,6 +1506,16 @@ namespace Thirteen
                 if (wParam < 256)
                     keys[wParam] = false;
                 return 0;
+            }
+            case WM_SYSKEYDOWN:
+            {
+                // Handle Alt+Enter to toggle fullscreen
+                if (wParam == VK_RETURN && (lParam & (1 << 29))) // Alt key is bit 29 of lParam
+                {
+                    Thirteen::SetFullscreen(!Thirteen::GetFullscreen());
+                    return 0;
+                }
+                break;
             }
         }
         return DefWindowProcW(hwnd, msg, wParam, lParam);
